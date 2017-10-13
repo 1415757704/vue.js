@@ -764,6 +764,77 @@
 	</div>
 </body>
 11. 更加靠谱的组件通信方案: 单一事件管理通信 
+	//组件间的通信：Event.$emit()/Event.$on()
+	<body>
+	<script>
+		var Event = new Vue();
+	
+		var A = {
+				template : '#a-template',
+				data(){
+					return {
+						a : '我是A组件数据'
+					};
+				},
+				methods:{
+					send(){
+						Event.$emit('a-msg',this.a);
+					}
+				}
+		};
+		
+		var B = {
+				template : "<h1>我是组件B</h1>",
+				data(){
+					return {
+						a : '我是B组件数据'
+					};
+				}
+		};
+		
+		var C = {
+				template : `<div><h1>我是组件C</h1>-{{a}}</div>`,//要使用<div>包括起来，不然显示不出来
+				mounted(){
+					console.log('mounted');
+					var _this = this;
+					Event.$on('a-msg',function(data){
+						console.log(data);
+						this.a = data;
+					}.bind(this));
+				},
+				data(){
+					return {
+						a : 'a'
+					}
+				}
+		};
+		
+		$(function(){
+			var vm = new Vue({
+				el : '#box',
+				data : {
+					
+				},
+				components:{
+					'a-component' : A,
+					'b-component' : B,
+					'c-component' : C
+				}
+			});
+		});
+	</script>
+	
+	<template id="a-template">
+		
+		<input type="submit" @click="send()">传输数据到B组件</button>
+	</template>
+	<div id="box">
+		<a-component></a-component>
+		<b-component></b-component>
+		<c-component></c-component>
+	</div>
+	</body>
+	
 智能社：Javascript之vue.JS(六） 
 1.vue2.0的过渡(transition) 
 2.过渡的钩子函数(hook) 
