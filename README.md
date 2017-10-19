@@ -837,11 +837,314 @@
 	
 智能社：Javascript之vue.JS(六） 
 1.vue2.0的过渡(transition) 
+   <body>
+	<!--使用transation主要定义.fade-leave-active、.fade-leave-enter，使用transition标签包住即可-->
+	<div id="box">
+		<input type="submit" value="点击" @click="show=!show"/>
+		<transition name="fade" 
+			@before-enter="beforeEnter"
+			@enter="enter"
+			@after-enter="afterEnter"
+			@before-leave="beforeLeave"
+			@leave="leave"
+			@after-leave="afterLeave">
+			<p v-show="show"></p>
+		</transition>
+	</div>
+	<script>
+		$(function(){
+			var vm = new Vue({
+				el : '#box',
+				data : {
+					show : true
+				},
+				methods:{
+					beforeEnter(el){
+						//el是要使用动画的元素
+					},
+					enter(el){
+						
+					},
+					afterEnter(el){
+						el.style.background='blue';
+					},
+					beforeLeave(el){
+						//el是要使用动画的元素
+					},
+					leave(el){
+						
+					},
+					afterLeave(el){
+						el.style.background='red';
+					}
+				}
+			});
+		});
+	</script>
+</body>
+
+
+<!--transation与animated进行动画操作、使用transation进行包裹、使用enter-active-class、并在使用动画的标签上使用class="animated"、同时要引入
+link-->
+<link rel="stylesheet" href="./css/animate.css">
+<body>
+	<div id="box">
+		<input type="submit" value="点击" @click="show=!show"/>
+		<transition enter-active-class="bounceInLeft" leave-active-class="bounceOutRight">
+			<p v-show="show" class="animated"></p>
+		</transition>
+		
+		<transition enter-active-class="zoomInLeft" leave-active-class="zoomOutRight">
+			<p v-show="show" class="animated"></p>
+		</transition>
+	</div>
+	<script>
+		$(function(){
+			var vm = new Vue({
+				el : '#box',
+				data : {
+					show : false
+				},
+				methods:{
+				}
+			});
+		});
+	</script>
+</body>
 2.过渡的钩子函数(hook) 
 3.多个元素过渡 
 4.vue-router2.0的使用 
 5.路由和动画结合 
-6.vue脚手架2.0的使用  
+6.vue router2.0的使用  
+   1、html：
+   	<div id="box">
+		<!--定义两个连接-->
+		<div>
+			<router-link to="/home">主页</router-link>
+			<router-link to="/news">新闻页</router-link>
+		</div>
+		<div>
+			<!-- 显示路由 -->
+			<router-view></router-view>
+		</div>
+	</div>
+    2、js
+    <script>
+		//定义组件
+		var Home = {
+				template : "<h3>我是主页</h3>"
+		}
+		var News = {
+				template : "<h3>我是新闻页</h3>"
+		}
+		//设置路由
+		var routes = [
+				{path:'/home',component:Home},
+				{path:'/news',component:News},
+				{path:'*', redirect:'/home'}
+		];
+		//创建路由
+		var router = new VueRouter({
+			routes : routes
+		});
+		//挂载路由到Vue上
+		new Vue({
+			router :　router,
+			el:'#box'
+		});
+	</script>
+   3、为选中项设置样式
+   	.router-link-active{
+		font-size : 20px;
+		color : #f60;
+	}
+	
+   <!--在路由下设置子路由-->
+   <style>
+	p{
+		width : 100px;
+		height: 100px;
+		opacity : 1;
+		background : red;
+		margin : 0 auto;
+	}
+	.router-link-active{
+		font-size : 20px;
+		color : #f60;
+	}
+</style>
+
+<!--在路由下配置子路由-->
+<body>
+	<div id="box">
+		<!--定义两个连接-->
+		<div>
+			<router-link to="/home">主页</router-link>
+			<router-link to="/news">新闻页</router-link>
+		</div>
+		<div>
+			<!-- 显示路由 -->
+			<router-view></router-view>
+		</div>
+	</div>
+	
+	<script>
+		//定义组件
+		var Home = {
+				template : "<h3>我是主页</h3>"
+		}
+		var News = {
+				template : `
+				<div>
+					<h3>我是新闻页</h3>
+					<router-link to="/news/detail">详情页</router-link>
+					<!--这里主要是为了显示组件-->
+					<router-view></router-view>
+				</div>`
+		}
+		var Detail = {
+				template : "<h3>我是详情页</h3>"
+		}
+		//设置路由
+		var routes = [
+				{path:'/home',component:Home},
+				{path:'/news',component:News,
+					children :　[{   //这里相当于也是一个ｒｏｕｔｅｓ
+						path:'detail',component:Detail //这里的detail不能加/
+					}]},
+				{path:'*', redirect:'/home'}
+		];
+		//创建路由
+		var router = new VueRouter({
+			routes : routes
+		});
+		//挂载路由到Vue上
+		new Vue({
+			router :　router,
+			el:'#box'
+		});
+	</script>
+</body>
+
+<!--点击路由连接的时候获取路径中的数据-->
+<body>
+	<div id="box">
+		<button @click='push'>添加一个路由到堆栈中</button>
+		<!--定义两个连接-->
+		<div>
+			<router-link to="/home">主页</router-link>
+			<router-link to="/news">新闻页</router-link>
+		</div>
+		<div>
+			<!-- 显示路由 -->
+			<router-view></router-view>
+		</div>
+	</div>
+	
+	<script>
+		//定义组件
+		var Home = {
+				template : "<h3>我是主页</h3>"
+		}
+		var News = {
+				template : `
+				<div>
+					<h3>我是新闻页</h3>
+					<!--点击连接的时候获取连接中的值-->
+					<router-link to="/news/red/age/10">red</router-link>
+					<router-link to="/news/green/age/9">green</router-link>
+					<router-link to="/news/black/age/16">black</router-link>
+					<router-view></router-view>
+				</div>`
+		}
+		var Detail = {
+				<!--获取：中的值-->
+				template : `<h3>我是{{$route.params}}</h3>`
+		}
+		//设置路由
+		var routes = [
+				{path:'/home',component:Home},
+				{path:'/news',component:News,
+					children :　[{   //这里相当于也是一个ｒｏｕｔｅｓ
+						path:':detail/age/:age',component:Detail //:说明将这个位置的值加入到param中
+					}]},
+				{path:'*', redirect:'/home'}
+		];
+		//创建路由
+		var router = new VueRouter({
+			routes : routes
+		});
+		//挂载路由到Vue上
+		new Vue({
+			router :　router,
+			el:'#box',
+			methods:{
+				push(){
+					routes.push({path:'news'});//点击按钮的时候跳转到这个路由并把这个路由添加到堆栈中，类似android中的回
+					//退栈中
+				}
+			}
+		}).$amount('#box');
+	</script>
+</body>
+
+<!--设置路由跳转并且添加到history中、配合transition设置动画-->
+<body>
+	<div id="box">
+		<!--定义两个连接-->
+		<div>
+			<router-link to="/home">主页</router-link>
+			<router-link to="/news">新闻页</router-link>
+		</div>
+		<div>
+			<!--使用动画、只需要使用transition包裹、声明两个class即可 -->
+			<transition enter-active-class="animated bounceInLeft" leave-active-class="animated bounceOutRight">
+				<!-- 显示路由 -->
+				<router-view></router-view>
+			</transition>
+		</div>
+	</div>
+	
+	<script>
+		//定义组件
+		var Home = {
+				template : "<h3>我是主页</h3>"
+		}
+		var News = {
+				template : `
+				<div>
+					<h3>我是新闻页</h3>
+					<!--点击连接的时候获取连接中的值-->
+					<router-link to="/news/red/age/10">red</router-link>
+					<router-link to="/news/green/age/9">green</router-link>
+					<router-link to="/news/black/age/16">black</router-link>
+					<router-view></router-view>
+				</div>`
+		}
+		var Detail = {
+				<!--获取：中的值-->
+				template : `<h3>我是{{$route.params}}</h3>`
+		}
+		//设置路由
+		var routes = [
+				{path:'/home',component:Home},
+				{path:'/news',component:News,
+					children :　[{   //这里相当于也是一个ｒｏｕｔｅｓ
+						path:':detail/age/:age',component:Detail //:说明将这个位置的值加入到param中
+					}]},
+				{path:'*', redirect:'/home'}
+		];
+		//创建路由
+		var router = new VueRouter({
+			routes : routes
+		});
+		//挂载路由到Vue上
+		new Vue({
+			router :　router,
+			el:'#box'
+		});
+	</script>
+</body>
 7.vue-loader结合路由 
 8.loader的顺序问题 
 智能社：Javascript之vue.JS(七）    
@@ -858,6 +1161,7 @@
 1.vuex的讲解以及实例 
 智能社：Javascript之vue.JS(十）        
 1.vue2.0仿手机新闻项目 
+	vue init webpack-simple vue-new-project
 智能社：Javascript之vue.JS(十一） 
 1.总结 
  
